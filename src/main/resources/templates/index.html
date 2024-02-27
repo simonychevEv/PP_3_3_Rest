@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <meta charset="UTF-8">
+    <title>Spring Security Example</title>
+    <style>
+        a {
+            text-decoration: none;
+        }
+        button {
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div style="display: flex; align-items: center; justify-content: space-between">
+    <h1>User, welcome spring boot security page!</h1>
+    <a sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" href="/logout">
+        <button style="cursor: pointer; padding: 5px 20px; font-size: 20px; background-color: red; color: white; border-radius: 3px">
+            Выйти
+        </button>
+    </a>
+</div>
+
+<form sec:authorize="! hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" th:action="@{/login}" th:method="GET">
+    <button class="btn input-action" type="submit">Войти</button>
+    <br>
+    <br>
+</form>
+
+<form sec:authorize="hasRole('ROLE_ADMIN')" th:action="@{/admin}" th:method="GET">
+    <button class="btn input-action" type="submit">Пользователи</button>
+    <br>
+    <br>
+</form>
+
+<form sec:authorize="hasRole('ROLE_USER')" th:action="@{/user}" th:method="GET">
+    <button class="btn input-action" type="submit">Пользователь</button>
+</form>
+
+</body>
+</html>

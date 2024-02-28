@@ -19,11 +19,15 @@
 
 <section class="d-flex">
 
-    <div class="col-2 bg-white">
-            <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                <button class="nav-link active" id="v-pills-home-tab" data-bs-toggle="tab" data-bs-target="#v-pills-home" type="button" role="tab" aria-controls="v-pills-home" aria-selected="true">Admin</button>
-                <button class="nav-link" id="v-pills-profile-tab" data-bs-toggle="tab" data-bs-target="#v-pills-profile" type="button" role="tab" aria-controls="v-pills-profile" aria-selected="false">User</button>
-            </div>
+    <div class="col-2 bg-white mt-3">
+        <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+            <button class="nav-link active" id="v-pills-home-tab" data-bs-toggle="tab" data-bs-target="#v-pills-home"
+                    type="button" role="tab" aria-controls="v-pills-home" aria-selected="true">Admin
+            </button>
+            <button class="nav-link" id="v-pills-profile-tab" data-bs-toggle="tab" data-bs-target="#v-pills-profile"
+                    type="button" role="tab" aria-controls="v-pills-profile" aria-selected="false">User
+            </button>
+        </div>
     </div>
 
     <div class="col-10 bg-light">
@@ -33,10 +37,14 @@
                     <h2 class="mt-3">Admin panel</h2>
                     <ul class="nav nav-tabs" id="myTab" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Users table</button>
+                            <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home"
+                                    type="button" role="tab" aria-controls="home" aria-selected="true">Users table
+                            </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">New User</button>
+                            <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile"
+                                    type="button" role="tab" aria-controls="profile" aria-selected="false">New User
+                            </button>
                         </li>
                     </ul>
                     <div class="tab-content" id="myTabContent">
@@ -61,41 +69,41 @@
                         </div>
                         <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
                             <h4>Add new user</h4>
-                            <form class="text-center fw-bold bg-white pt-3" action="@{/admin/add-user}" method="post">
+                            <form class="text-center fw-bold bg-white pt-3" id="newUser">
+                                <!--                                <div class="form-group mx-auto col-4">-->
+                                <!--                                    <input name="id" type="hidden" id="idUser">-->
+                                <!--                                </div>-->
                                 <div class="form-group mx-auto col-4">
-                                    <input name="id" type="hidden" id="idUser">
-                                </div>
-                                <div class="form-group mx-auto col-4">
-                                    <label for="firstName">First name</label>
-                                    <input name="username"  type="text" class="form-control" id="firstNameUser">
+                                    <label for="username">First name</label>
+                                    <input name="username" type="text" class="form-control" id="username">
                                 </div>
                                 <div class="form-group mx-auto mt-2 col-4">
                                     <label for="lastName">Last name</label>
-                                    <input name="lastName"  type="text" class="form-control" id="lastNameUser">
+                                    <input name="lastName" type="text" class="form-control" id="lastName">
                                 </div>
                                 <div class="form-group mx-auto mt-2 col-4">
                                     <label for="age">Age</label>
-                                    <input name="age"  type="number" class="form-control" id="ageUser">
+                                    <input name="age" type="number" class="form-control" id="age">
                                 </div>
                                 <div class="form-group mx-auto col-4">
                                     <label for="email">Email</label>
-                                    <input name="email"  type="email" class="form-control" id="emailUser">
+                                    <input name="email" type="email" class="form-control" id="email">
                                 </div>
                                 <div class="form-group mx-auto mt-2 col-4">
                                     <label for="password">Password</label>
-                                    <input name="password"  type="password" class="form-control" id="passwordUser">
+                                    <input name="password" type="password" class="form-control" id="password">
                                 </div>
                                 <div class="form-group mx-auto mt-2 col-4">
-                                    <label for="role">Role</label>
-                                    <select name="roles"  size="2"
+                                    <label for="roles">Role</label>
+                                    <select name="roles" size="2"
                                             multiple required class="form-select mx-auto"
-                                            aria-label="Default select" id="role">
+                                            aria-label="Default select" id="roles">
                                         <option value="1" selected>ADMIN</option>
                                         <option value="2" selected>USER</option>
                                     </select>
                                 </div>
                                 <div class="form-group mx-auto mt-2 col-4 mb-3">
-                                    <button type="submit" class="btn btn-success">Add new user</button>
+                                    <button type="submit" class="btn btn-success" id="addNewUser">Add new user</button>
                                 </div>
                             </form>
                         </div>
@@ -120,7 +128,7 @@
                         </tr>
                         </thead>
 
-                        <tbody>
+                        <tbody id="userInfo">
                         <tr class="text-center align-middle">
                             <td>user.id</td>
                             <td>user.username</td>
@@ -135,7 +143,6 @@
             </div>
         </div>
     </div>
-
 
 
 </section>
@@ -157,29 +164,29 @@
                            id="idEdit" disabled>
                 </div>
                 <div class="form-group mx-auto col-6">
-                    <label for="firstName">First name</label>
+                    <label for="firstNameEdit">First name</label>
                     <input name="username" th:value="${user.username}" type="text"
-                           class="form-control" id="firstName">
+                           class="form-control" id="firstNameEdit">
                 </div>
                 <div class="form-group mx-auto mt-2 col-6">
-                    <label for="lastName">Last name</label>
+                    <label for="lastNameEdit">Last name</label>
                     <input name="lastName" th:value="${user.lastName}" type="text"
-                           class="form-control" id="lastName">
+                           class="form-control" id="lastNameEdit">
                 </div>
                 <div class="form-group mx-auto mt-2 col-6">
-                    <label for="age">Age</label>
+                    <label for="ageEdit">Age</label>
                     <input name="age" th:value="${user.age}" type="number" class="form-control"
-                           id="age">
+                           id="ageEdit">
                 </div>
                 <div class="form-group mx-auto col-6">
-                    <label for="email">Email</label>
+                    <label for="emailEdit">Email</label>
                     <input name="email" th:value="${user.email}" type="email" class="form-control"
-                           id="email">
+                           id="emailEdit">
                 </div>
                 <div class="form-group mx-auto mt-2 col-6">
-                    <label for="password">Password</label>
+                    <label for="passwordEdit">Password</label>
                     <input name="password" th:value="${user.password}" type="password"
-                           class="form-control" id="password">
+                           class="form-control" id="passwordEdit">
                 </div>
                 <div class="form-group mx-auto mt-2 col-6 mb-4">
                     <label for="roleEdit">Role</label>

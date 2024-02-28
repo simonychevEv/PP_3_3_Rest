@@ -1,10 +1,22 @@
 const userEmail = document.getElementById('userEmail');
 const userRole = document.getElementById('userRole');
 const showAllUser = document.getElementById('showAllUser');
-const textBody = document.getElementById('textBody');
+const userInfo = document.getElementById('userInfo');
+const addNewUserBtn = document.getElementById('newUser');
 let userInfoHeader = "";
 
+addNewUserBtn.addEventListener('submit', addNewUser);
+
 showUsers()
+
+fetch("http://localhost:8080/api/userinfo")
+    .then(res => res.json())
+    .then(data => {
+        userInfoHeader = data;
+        showUser(userInfoHeader);
+        userEmail.innerText = userInfoHeader.email;
+        userRole.innerText = userInfoHeader.roles.map(role => role.name.substring(5, role.length)).join(", ");
+    });
 
 function showUsers() {
     fetch("http://localhost:8080/api/users")
@@ -21,14 +33,6 @@ function showUsers() {
             showAllUsers(usersTable);
         })
 }
-
-fetch("http://localhost:8080/api/userinfo")
-    .then(res => res.json())
-    .then(data => {
-        userInfoHeader = data;
-        userEmail.innerText = userInfoHeader.email;
-        userRole.innerText = userInfoHeader.roles.map(role => role.name.substring(5, role.length)).join(", ");
-    });
 
 function showAllUsers(users) {
     let text = "";
@@ -56,99 +60,66 @@ function showAllUsers(users) {
     showAllUser.innerHTML = text;
 }
 
-// function showNewUsers() {
-//     userInfoTable = "";
-//     fetch("http://localhost:8080/api/users/new")
-//         .then(res => res.json())
-//         .then(user => {
-//             userInfoTable += `
-//     < h2
-//
-//     class
-//
-//     = "mt-3" > Admin
-//     panel < /h2>
-//     <div class="nav nav-tabs mb-2">
-//         <button data-bs-toggle="tab" class="nav-link" onclick="showUsers()">Users table</button>
-//         <button data-bs-toggle="tab" class="nav-link active" onclick="showNewUsers()">New User</button>
-//     </div>
-//     <h4>Add new user</h4>
-//     <form class="text-center fw-bold bg-white pt-3" action="http://localhost:8080/api/users/new" method="post">
-//         <div class="form-group mx-auto col-4">
-//             <input name="id" type="hidden" id="id">
-//         </div>
-//         <div class="form-group mx-auto col-4">
-//             <label for="firstName">First name</label>
-//             <input name="username" type="text" class="form-control" id="firstName">
-//         </div>
-//         <div class="form-group mx-auto mt-2 col-4">
-//             <label for="lastName">Last name</label>
-//             <input name="lastName" type="text" class="form-control" id="lastName">
-//         </div>
-//         <div class="form-group mx-auto mt-2 col-4">
-//             <label for="age">Age</label>
-//             <input name="age" type="number" class="form-control" id="age">
-//         </div>
-//         <div class="form-group mx-auto col-4">
-//             <label for="email">Email</label>
-//             <input name="email" type="email" class="form-control" id="email">
-//         </div>
-//         <div class="form-group mx-auto mt-2 col-4">
-//             <label for="password">Password</label>
-//             <input name="password" type="password" class="form-control" id="password">
-//         </div>
-//         <div class="form-group mx-auto mt-2 col-4">
-//             <label for="role">Role</label>
-//             <select name="roles" size="2"
-//                     multiple required class="form-select mx-auto"
-//                     aria-label="Default select" id="roles">
-//                 <option value="1" selected>ADMIN</option>
-//                 <option value="2" selected>USER</option>
-//             </select>
-//         </div>
-//         <div class="form-group mx-auto mt-2 col-4 mb-3">
-//             <button type="submit" class="btn btn-success">Add new user</button>
-//         </div>
-//     </form>
-// `
-//             textBody.innerHTML = userInfoTable;
-//         })
-// }
-
-function showUser() {
-    userInfoTable = "";
-    fetch("http://localhost:8080/api/userinfo")
-        .then(res => res.json())
-        .then(data => {
-            userInfoTable += `    
-    <h2 class="mt-3">User information page</h2>
-
-    <h4>About users</h4>
-    <table class="table bg-white">
-
-        <thead>
-        <tr class="text-center">
-            <th>ID</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Age</th>
-            <th>Email</th>
-            <th>Role</th>
-        </tr>
-        </thead>
-
-        <tbody>
+function showUser(user) {
+    userInfo.innerHTML = `
         <tr class="text-center align-middle">
-            <td>` + data.id + `</td>
-            <td>` + data.username + `</td>
-            <td>` + data.lastName + `</td>
-            <td>` + data.age + `</td>
-            <td>` + data.email + `</td>
-            <td>` + data.roles.map(role => role.name.substring(5, role.length)).join(", ") + `</td>
-        </tr>
-        </tbody>
-    </table>
-    `
-            textBody.innerHTML = userInfoTable;
-        })
+            <td>` + user.id + `</td>
+            <td>` + user.username + `</td>
+            <td>` + user.lastName + `</td>
+            <td>` + user.age + `</td>
+            <td>` + user.email + `</td>
+            <td>` + user.roles.map(role => role.name.substring(5, role.length)).join(", ") + `</td>
+        </tr>     
+    `;
+}
+
+function addNewUser(event) {
+    event.preventDefault();
+    let formNewUser = new FormData(event.target);
+    let user = {
+        username: formNewUser.get('username'),
+        lastName: formNewUser.get('lastName'),
+        age: formNewUser.get('age'),
+        email: formNewUser.get('email'),
+        password: formNewUser.get('password'),
+        roles: rolesUser('#roles'),
+    };
+    let request = new Request('/api/users/new', {
+        method: 'POST',
+        body: JSON.stringify(user),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+    fetch(request).then(() => showUsers());
+    event.target.reset();
+}
+
+function createRole(id, name) {
+    return {
+        id,
+        name,
+    };
+}
+
+function rolesUser(event) {
+    const rolesAdmin = createRole(1, "ROLE_ADMIN");
+    const rolesUser = createRole(2, "ROLE_USER");
+    let roles = [];
+    let allRoles = [];
+    let sel = document.querySelector(event);
+    for (let i = 0, n = sel.options.length; i < n; i++) {
+        if (sel.options[i].selected) {
+            roles.push(sel.options[i].value);
+        }
+    }
+    if (roles.includes('1')) {
+        allRoles.push(rolesAdmin);
+    }
+    if (roles.includes('2')) {
+        allRoles.push(rolesUser);
+    } else if (roles.length === 0) {
+        allRoles.push(rolesUser)
+    }
+    return allRoles;
 }

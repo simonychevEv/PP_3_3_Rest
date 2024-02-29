@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.kata.spring.boot_security.demo.model.User;
+import ru.kata.spring.boot_security.demo.service.RoleService;
 import ru.kata.spring.boot_security.demo.service.UserService;
 
 import java.security.Principal;
@@ -17,36 +18,42 @@ public class MyRestController {
     private final UserService userService;
 
     @Autowired
-    public MyRestController(UserService userService) {
+    public MyRestController(UserService userService, RoleService roleService) {
         this.userService = userService;
     }
 
-    @GetMapping("/users")
+    @GetMapping("/admin")
     public ResponseEntity<List<User>> showAllUsers() {
         return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
     }
 
-    @GetMapping("/userinfo")
+    @GetMapping("/user")
     public ResponseEntity<User> showUser(Principal principal) {
         return new ResponseEntity<>(userService.findByUsername(principal.getName()), HttpStatus.OK);
     }
 
-    @PostMapping("/users/new")
+    @PostMapping("/admin/new")
     public ResponseEntity<User> addNewUser(@RequestBody User user) {
         userService.addUser(user);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-    @PutMapping("/users/update")
-    public ResponseEntity<User> updateUser(@RequestParam("userId") int id, User user) {
+    @GetMapping("/admin/{id}")
+    public ResponseEntity<User> findUserById(@PathVariable int id) {
+        User user = userService.findUserById(id);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
+    @PutMapping("/admin/update/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable int id, @RequestBody User user) {
         user.setId(id);
         userService.addUser(user);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-    @DeleteMapping("/users/delete")
-    public ResponseEntity<String> deleteUser(@RequestParam("userId") int id) {
+    @DeleteMapping("/admin/delete/{id}")
+    public ResponseEntity<String> deleteUser(@PathVariable int id) {
         userService.deleteUser(id);
-        return new ResponseEntity<>("User with id " + id + " was deleted.", HttpStatus.OK);
+        return new ResponseEntity<>("User deleted", HttpStatus.OK);
     }
 }

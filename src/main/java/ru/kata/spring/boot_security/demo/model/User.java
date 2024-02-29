@@ -23,7 +23,7 @@ public class User implements UserDetails {
     private int age;
     private String email;
     private String password;
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.MERGE)
     @LazyCollection(LazyCollectionOption.EXTRA)
     @Fetch(FetchMode.JOIN)
     @JoinTable(name = "users_roles",

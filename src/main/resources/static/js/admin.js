@@ -3,23 +3,46 @@ const userRole = document.getElementById('userRole');
 const showAllUser = document.getElementById('showAllUser');
 const userInfo = document.getElementById('userInfo');
 const addNewUserBtn = document.getElementById('newUser');
-let userInfoHeader = "";
+const homeTab = document.querySelector('#home-tab');
+
+const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+const idEdit = document.getElementById('idEdit');
+const firstNameEdit = document.getElementById('firstNameEdit');
+const lastNameEdit = document.getElementById('lastNameEdit');
+const ageEdit = document.getElementById('ageEdit');
+const emailEdit = document.getElementById('emailEdit');
+const passwordEdit = document.getElementById('passwordEdit');
+const rolesAdminEdit = document.getElementById('rolesAdminEdit');
+const rolesUserEdit = document.getElementById('rolesUserEdit');
+const editUser = document.getElementById('editUser');
+
+const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+const idDelete = document.getElementById('idDelete');
+const firstNameDelete = document.getElementById('firstNameDelete');
+const lastNameDelete = document.getElementById('lastNameDelete');
+const ageDelete = document.getElementById('ageDelete');
+const emailDelete = document.getElementById('emailDelete');
+const rolesAdminDelete = document.getElementById('rolesAdminDelete');
+const rolesUserDelete = document.getElementById('rolesUserDelete');
+const deleteUser = document.getElementById('deleteUser');
 
 addNewUserBtn.addEventListener('submit', addNewUser);
 
 showUsers()
+getUserInfo()
 
-fetch("http://localhost:8080/api/userinfo")
-    .then(res => res.json())
-    .then(data => {
-        userInfoHeader = data;
-        showUser(userInfoHeader);
-        userEmail.innerText = userInfoHeader.email;
-        userRole.innerText = userInfoHeader.roles.map(role => role.name.substring(5, role.length)).join(", ");
-    });
-
+function getUserInfo() {
+    fetch("/api/user")
+        .then(res => res.json())
+        .then(data => {
+            let userInfoHeader = data;
+            showUser(userInfoHeader);
+            userEmail.innerText = userInfoHeader.email;
+            userRole.innerText = userInfoHeader.roles.map(role => role.name.substring(5, role.length)).join(", ");
+        });
+}
 function showUsers() {
-    fetch("http://localhost:8080/api/users")
+    fetch("/api/admin")
         .then(res => res.json())
         .then(users => {
             let usersTable = [];
@@ -46,12 +69,12 @@ function showAllUsers(users) {
         <td>` + user.email + `</td>
         <td>` + user.roles.map(role => role.name.substring(5, role.length)).join(", ") + `</td>
         <td>
-            <button type="button" class="btn btn-info" data-bs-toggle="modal"
+            <button type="button" class="btn btn-info" data-bs-toggle="modal" onclick="editModalUser(${user.id})"
                 data-bs-target="#editModal">Edit
             </button>
         </td>
         <td>
-            <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+            <button type="button" class="btn btn-danger" data-bs-toggle="modal" onclick="deleteModalUser(${user.id})"
                 data-bs-target="#deleteModal">Delete
             </button>
         </td>
@@ -84,15 +107,18 @@ function addNewUser(event) {
         password: formNewUser.get('password'),
         roles: rolesUser('#roles'),
     };
-    let request = new Request('/api/users/new', {
+    console.log(user)
+    let request = new Request('/api/admin/new', {
         method: 'POST',
         body: JSON.stringify(user),
         headers: {
             'Content-Type': 'application/json'
         }
     });
-    fetch(request).then(() => showUsers());
-    event.target.reset();
+    fetch(request).then(() =>
+        showUsers());
+        event.target.reset();
+        homeTab.click();
 }
 
 function createRole(id, name) {
@@ -122,4 +148,85 @@ function rolesUser(event) {
         allRoles.push(rolesUser)
     }
     return allRoles;
+}
+
+async function editModalUser(id) {
+    await fetch("/api/admin/" + id).then(res => res.json()).then(user => {
+        idEdit.setAttribute('value', user.id);
+        firstNameEdit.setAttribute('value', user.username);
+        lastNameEdit.setAttribute('value', user.lastName);
+        ageEdit.setAttribute('value', user.age);
+        emailEdit.setAttribute('value', user.email);
+        passwordEdit.setAttribute('value', user.password);
+        if ((user.roles.map(role => role.name.includes("ADMIN"))) && ((user.roles.map(role => role.name.includes("USER"))))) {
+            rolesAdminEdit.setAttribute('selected', true);
+            rolesUserEdit.setAttribute('selected', true);
+        }
+        if ((user.roles.map(role => role.name.includes("ADMIN")))) {
+            rolesAdminEdit.setAttribute('selected', true);
+        }
+        if ((user.roles.map(role => role.name.includes("USER")))) {
+            rolesUserEdit.setAttribute('selected', true);
+        }
+    });
+    editUser.addEventListener('submit', event => {
+        event.preventDefault();
+        let userUpdate = new FormData(event.target);
+        let user = {
+            id: userUpdate.get('id'),
+            username: userUpdate.get('username'),
+            lastName: userUpdate.get('lastName'),
+            age: userUpdate.get('age'),
+            email: userUpdate.get('email'),
+            password: userUpdate.get('password'),
+            roles: rolesUser('#roleEdit'),
+        };
+        let request = new Request("/api/admin/update/" + id, {
+            method: 'PUT',
+            body: JSON.stringify(user),
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        fetch(request).then(
+            () => {
+                showUsers();
+                editModal.hide();
+            });
+    });
+}
+
+async function deleteModalUser(id) {
+    await fetch("/api/admin/" + id).then(res => res.json()).then(user => {
+        idDelete.setAttribute('value', user.id);
+        firstNameDelete.setAttribute('value', user.username);
+        lastNameDelete.setAttribute('value', user.lastName);
+        ageDelete.setAttribute('value', user.age);
+        emailDelete.setAttribute('value', user.email);
+        if ((user.roles.map(role => role.name.includes("ADMIN"))) && ((user.roles.map(role => role.name.includes("USER"))))) {
+            rolesAdminEdit.setAttribute('selected', true);
+            rolesUserEdit.setAttribute('selected', true);
+        }
+        if ((user.roles.map(role => role.name.includes("ADMIN")))) {
+            rolesAdminEdit.setAttribute('selected', true);
+        }
+        if ((user.roles.map(role => role.name.includes("USER")))) {
+            rolesUserEdit.setAttribute('selected', true);
+        }
+    });
+
+    deleteUser.addEventListener('submit', event => {
+        event.preventDefault();
+        let request = new Request("/api/admin/delete/" + id, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        fetch(request).then(
+            () => {
+                showUsers();
+                deleteModal.hide();
+            });
+    });
 }
